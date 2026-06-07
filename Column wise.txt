@@ -1,0 +1,45 @@
+#include <iostream>
+using namespace std;
+
+int main() {
+    int R, C;
+    cin >> R >> C;
+
+    int grid[R][C];
+    int dp[R][C];
+
+    for (int i = 0; i < R; i++) {
+        for (int j = 0; j < C; j++) {
+            cin >> grid[i][j];
+        }
+    }
+
+    for (int i = 0; i < R; i++) {
+        dp[i][0] = grid[i][0];
+    }
+
+    for (int j = 1; j < C; j++) {
+        for (int i = 0; i < R; i++) {
+
+            int maxi = 0;
+
+            for (int k = 0; k < R; k++) {
+                if (k != i) {
+                    maxi = max(maxi, dp[k][j - 1]);
+                }
+            }
+
+            dp[i][j] = grid[i][j] + maxi;
+        }
+    }
+
+    int ans = 0;
+
+    for (int i = 0; i < R; i++) {
+        ans = max(ans, dp[i][C - 1]);
+    }
+
+    cout << ans;
+
+    return 0;
+}
