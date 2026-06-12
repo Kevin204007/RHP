@@ -1,0 +1,41 @@
+#include <iostream>
+#include <unordered_map>
+using namespace std;
+
+int main()
+{
+    string s;
+    cout << "Enter a binary string: ";
+    cin >> s;
+
+    unordered_map<int, int> firstPos;
+
+    int sum = 0;
+    int maxLength = 0;
+
+    firstPos[0] = -1;
+
+    for (int i = 0; i < s.length(); i++)
+    {
+        if (s[i] == '0')
+            sum--;
+        else
+            sum++;
+
+        if (firstPos.count(sum))
+        {
+            int length = i - firstPos[sum];
+
+            if (length > maxLength)
+                maxLength = length;
+        }
+        else
+        {
+            firstPos[sum] = i;
+        }
+    }
+
+    cout << "Length of longest balanced substring = " << maxLength;
+
+    return 0;
+}
