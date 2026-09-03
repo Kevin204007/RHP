@@ -1,0 +1,80 @@
+class Solution {
+
+    public int gci(int row, int col, int C) {
+        return row * C + col;
+    }
+
+    public int find(int[] leader, int node) {
+        if (leader[node] != node) {
+            leader[node] = find(leader, leader[node]);
+        }
+        return leader[node];
+    }
+
+    public void join(int[] leader, int left, int right) {
+        int leInd = find(leader, left);
+        int rtInd = find(leader, right);
+
+        if (leInd != rtInd) {
+            leader[rtInd] = leInd;
+        }
+    }
+
+    public int latestDayToCross(int R, int C, int[][] cells) {
+
+        int total = R * C;
+        int TOP = total;
+        int BOTTOM = total + 1;
+
+        boolean[] land = new boolean[total];
+        int[] leader = new int[total + 2];
+
+        for (int i = 0; i < total + 2; i++) {
+            leader[i] = i;
+        }
+        // sir method we can movbe through all the directions. 8 adjacent ways
+        int[][] dir = {
+                {1, 0},
+                {-1, 0},
+                {0, 1},
+                {0, -1}
+        };
+
+        for (int day = cells.length - 1; day >= 0; day--) {
+
+            int r = cells[day][0] - 1;
+            int c = cells[day][1] - 1;
+
+            int idx = gci(r, c, C);
+            land[idx] = true;
+
+            if (r == 0) {
+                join(leader, idx, TOP);
+            }
+
+            if (r == R - 1) {
+                join(leader, idx, BOTTOM);
+            }
+
+            for (int[] d : dir) {
+                int nr = r + d[0];
+                int nc = c + d[1];
+
+                if (nr < 0 || nr >= R || nc < 0 || nc >= C)
+                    continue;
+
+                int nIdx = gci(nr, nc, C);
+
+                if (land[nIdx]) {
+                    join(leader, idx, nIdx);
+                }
+            }
+
+            if (find(leader, TOP) == find(leader, BOTTOM)) {
+                return day;
+            }
+        }
+
+        return 0;
+    }
+}

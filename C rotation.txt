@@ -1,0 +1,36 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <string>
+#define ll long long int
+using namespace std;
+
+
+void solve () {
+    int N,Q;
+    cin >> N >> Q;
+    string s;
+    cin >> s;
+    int pos=N-1;
+    while (Q--) {
+        int qt,x;
+        cin >> qt>>x;
+        x=x%N;
+        if (qt==1) {
+            pos=pos-x;
+            if (pos<0) pos+=N;
+        }
+        else {
+            cout<<s[(pos+x)%N]<<endl;
+        }
+    }
+}
+
+int main () {
+    ios_base::sync_with_stdio (false);
+    cin.tie(nullptr);
+    int T=1;
+    while (T--) {
+        solve();
+    }
+}

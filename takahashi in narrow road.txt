@@ -1,0 +1,124 @@
+#include <iostream>
+#include <vector>
+#include <map>
+#include <cmath>
+
+using namespace std;
+
+// Structure to track interval bounds and its common X' value
+struct Interval {
+    int r;
+    long long val;
+};
+
+// Global map to hold interval chunks: map<left_index, Interval>
+map<int, Interval> segments;
+
+// Split an interval at index 'idx' so that 'idx' becomes the start of a new interval
+void split(int idx, int n) {
+    if (idx <= 1 || idx > n) return;
+    auto it = segments.upper_bound(idx);
+    if (it == segments.begin()) return;
+    it--; // This interval contains 'idx'
+    
+    int l = it->first;
+    int r = it->second.r;
+    long long val = it->second.val;
+    
+    if (idx > l && idx <= r) {
+        segments[l] = {idx - 1, val};
+        segments[idx] = {r, val};
+    }
+}
+
+int main() {
+    // Optimize standard I/O operations for performance
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+
+    int n;
+    if (!(cin >> n)) return 0;
+
+    // Read initial coordinates and apply transformation X'_i = X_i - i
+    for (int i = 1; i <= n; i++) {
+        long long x;
+        cin >> x;
+        segments[i] = {i, x - i};
+    }
+
+    int q;
+    cin >> q;
+    long long total_ans = 0;
+
+    while (q--) {
+        int t;
+        long long g;
+        cin >> t >> g;
+        long long target_val = g - t; // Transformed destination coordinate
+
+        // Step 1: Isolate the element T into its own single-element boundaries if needed
+        split(t, n);
+        split(t + 1, n);
+
+        auto it = segments.find(t);
+        long long current_val = it->second.val;
+        long long cost = 0;
+
+        if (current_val < target_val) {
+            // Case A: Moving East (Right). Collect and merge affected elements ahead of T.
+            int left_bound = t;
+            int right_bound = t;
+            
+            while (right_bound <= n) {
+                auto curr_it = segments.find(left_bound);
+                if (curr_it->second.val >= target_val) break;
+                
+                int segment_r = curr_it->second.r;
+                long long segment_val = curr_it->second.val;
+                long long element_count = segment_r - left_bound + 1;
+                
+                cost += element_count * (target_val - segment_val);
+                right_bound = segment_r;
+                
+                // Erase old segment and prepare to look at the next right neighbor
+                segments.erase(curr_it);
+                left_bound = right_bound + 1;
+            }
+            // Insert the unified compressed segment
+            segments[t] = {right_bound, target_val};
+            
+        } else if (current_val > target_val) {
+            // Case B: Moving West (Left). Collect and merge affected elements behind T.
+            int left_bound = t;
+            int right_bound = t;
+            
+            while (left_bound >= 1) {
+                auto curr_it = segments.find(left_bound);
+                if (curr_it->second.val <= target_val) break;
+                
+                int segment_r = curr_it->second.r;
+                long long segment_val = curr_it->second.val;
+                long long element_count = segment_r - left_bound + 1;
+                
+                cost += element_count * (segment_val - target_val);
+                right_bound = segment_r;
+                
+                // Erase old segment and find the previous left neighbor
+                segments.erase(curr_it);
+                auto prev_it = segments.lower_bound(left_bound);
+                if (prev_it == segments.begin()) {
+                    left_bound = 0; // Out of bounds
+                } else {
+                    prev_it--;
+                    left_bound = prev_it->first;
+                }
+            }
+            // Insert the unified compressed segment
+            segments[left_bound + 1] = {right_bound, target_val};
+        }
+
+        cout << cost << "\n";
+    }
+
+    return 0;
+}
