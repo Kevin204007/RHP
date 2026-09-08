@@ -1,0 +1,49 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+
+void solve(){
+    int n, m;
+    cin >> n >> m;
+    vector<int> cnt(m+1, 0);
+    for (int i = 0; i < n; i++) {
+        int v; cin >> v;
+        cnt[v]++;
+    }
+    vector<ll> psum(m+1, 0);
+    psum[0] = cnt[0];
+    for (int i = 1; i <= m; i++) psum[i] = psum[i-1] + cnt[i];
+
+    int CAP = min(m, 18);
+    vector<ll> ans(CAP+1, 0);
+
+    for (int cut = 1; cut <= CAP; cut++) {
+        ll cap = (1LL << cut) - 1;
+        ll maxc = 0;
+        for (int x = 1; x <= m; x++) {
+            ll currc = 0;
+            for (ll mul = 1; mul * x <= m; mul++) {
+                ll lt = mul * x, rt = lt + x - 1;
+                if (rt > m) rt = m;
+                ll c = psum[rt] - psum[lt - 1];
+                currc += min(mul, cap) * c;
+            }
+            ll boundary = (1LL << cut) * (ll)x;
+            if (boundary <= m) currc += cnt[boundary];
+            maxc = max(maxc, currc);
+        }
+        ans[cut] = maxc;
+    }
+
+    for (int k = 1; k <= m; k++) {
+        int idx = min(k, CAP);
+        cout << ans[idx] << " \n"[k == m];
+    }
+}
+
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr);
+    int t; cin >> t;
+    while (t--) solve();
+}
