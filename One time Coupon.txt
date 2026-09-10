@@ -1,0 +1,41 @@
+#include <bits/stdc++.h>
+using namespace std;
+#define ll long long int
+
+void solve() {
+    int N; cin >> N;
+    vector<pair<int,int>> arr(N);
+    int mini = 2e9;
+    ll base = 0;
+
+    for (int i = 0; i < N; i++) {
+        cin >> arr[i].first >> arr[i].second;
+        mini = min(mini, arr[i].first);
+        base += arr[i].first;
+    }
+    sort(arr.begin(), arr.end(), [](const pair<int,int> &a, const pair<int,int> &b) {
+        return (a.first - a.second) > (b.first - b.second);
+    });
+
+    ll ans = base; // baseline: buy everything with A (0 coupons used)
+
+    for (int i = 1; i <= N; i++) {
+        base -= arr[i-1].first;
+        base += arr[i-1].second;
+        ll shortfall = i - (N - i);
+        ll curr = base + (shortfall > 0 ? 1LL * mini * shortfall : 0LL);
+
+        ans = min(ans, curr);
+    }
+
+    cout << ans << '\n';
+}
+
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    int T;
+    cin >> T;
+    while (T--) solve();
+}
