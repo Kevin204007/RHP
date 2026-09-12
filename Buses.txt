@@ -1,0 +1,58 @@
+#include <bits/stdc++.h>
+using namespace std;
+#define ll long long int
+
+struct Bus {
+    ll lt, rt;
+    double time;
+    bool operator<(const Bus& b) const {
+        if (lt != b.lt) return lt < b.lt;
+        return time < b.time;
+    }
+};
+
+void solve() {
+    ll B, P, L, bspeed, pspeed;
+    cin >> B >> P >> L >> bspeed >> pspeed;
+    vector<Bus> buses(B);
+    for (int i = 0; i < B; i++) {
+        cin >> buses[i].lt >> buses[i].rt;
+        buses[i].time =
+            (double)(buses[i].rt - buses[i].lt) / bspeed +
+            (double)(L - buses[i].rt) / pspeed;
+    }
+    sort(buses.begin(), buses.end());
+    for (int i = 0; i < B - 1; i++) {
+        buses[i + 1].time = min(buses[i + 1].time, buses[i].time);
+    }
+    for (int i = 0; i < P; i++) {
+        ll pos;
+        cin >> pos;
+        double ans = (double)(L - pos) / pspeed;
+        int lo = 0, hi = B - 1;
+        int best = -1;
+        while (lo <= hi) {
+            int mid = (lo + hi) / 2;
+            if (buses[mid].lt <= pos) {
+                best = mid;
+                lo = mid + 1;
+            } else {
+                hi = mid - 1;
+            }
+        }
+        if (best != -1) {
+            ans = min(ans, buses[best].time);
+        }
+        cout << fixed << setprecision(10) << ans << '\n';
+    }
+}
+
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr);
+    int T=1;
+    //cin>>T;
+    while (T--){
+        solve();
+    }
+}

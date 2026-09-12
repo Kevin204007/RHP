@@ -1,0 +1,23 @@
+#include <bits/stdc++.h>
+using namespace std;
+#define ll long long int
+
+void solve(){
+  int N; cin>>N;
+  int sum=0;
+  vector<int>a(N);
+  for(int i=0;i<N;i++){
+    cin>>a[i];
+    sum=sum+a[i];
+  }
+  sum = sum-N;
+  cout<<sum;
+}
+int main(){
+  ios_base::sync_with_stdio(false);
+  cin.tie(nullptr);
+  int T=1;
+  while(T--){
+    solve();
+  }
+}
